@@ -35,8 +35,6 @@ python -c "import nltk; nltk.download('punkt_tab'); nltk.download('stopwords')"
 python app.py
 ```
 
-Open **http://127.0.0.1:5000** in your browser.
-
 ## Project Structure
 
 ```
