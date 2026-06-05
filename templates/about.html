@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}About — PlagiarismAI{% endblock %}
+{% block content %}
+<div class="glass-card glass-card-lg" style="animation: fadeInUp 0.6s ease-out both;">
+    <h1 class="page-title">About PlagiarismAI</h1>
+    <p class="page-subtitle">A state-of-the-art Multi-Modal Plagiarism Detection System engineered for comprehensive analysis.</p>
+
+    <!-- Overview -->
+    <div class="about-section" style="margin-bottom: 3rem;">
+        <h3 class="section-title" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">📖 Project Overview</h3>
+        <p style="color:var(--text-secondary); line-height:1.8; font-size: 1.05rem;">
+            PlagiarismAI is an advanced multi-modal auditing platform designed to detect similarities across different file formats. Unlike traditional detectors that only look at raw text copying, PlagiarismAI combines high-performance natural language processing (NLP), semantic machine learning, and advanced computer vision layout analysis to scan document text structure, styles, colors, layouts, and live web resources.
+        </p>
+    </div>
+
+    <!-- 3 Modes Section -->
+    <div class="about-section" style="margin-bottom: 3rem;">
+        <h3 class="section-title" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">🔬 Core Comparison Modes</h3>
+        <div class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+            
+            <div class="feature-card" style="text-align: left; padding: 2rem; border-color: rgba(52, 152, 219, 0.2);">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">📄</div>
+                <h4 class="feature-title" style="color: var(--accent-blue); font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">1. Text Document Comparison</h4>
+                <p class="feature-desc" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                    Analyzes digital text content using a hybrid model:
+                    <ul style="padding-left: 1.25rem; margin-top: 0.5rem; color: var(--text-secondary);">
+                        <li><strong>TF-IDF Vectors (40%):</strong> Token occurrences frequency weighting.</li>
+                        <li><strong>Cosine Similarity (30%):</strong> Word counts direction similarity.</li>
+                        <li><strong>SBERT Transformers (30%):</strong> Underline semantic paraphrase understanding.</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="feature-card" style="text-align: left; padding: 2rem; border-color: rgba(231, 76, 60, 0.2);">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🖼️</div>
+                <h4 class="feature-title" style="color: var(--accent-red); font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">2. Visual Document Comparison</h4>
+                <p class="feature-desc" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                    Audits visual formatting, design structures, and posters using:
+                    <ul style="padding-left: 1.25rem; margin-top: 0.5rem; color: var(--text-secondary);">
+                        <li><strong>OCR Text Analysis (40%):</strong> Tesseract image text alignment.</li>
+                        <li><strong>Layout Contour Correlation (30%):</strong> Canny boundary shapes.</li>
+                        <li><strong>dHash Image Hashing (20%):</strong> Structural scale-invariant hashing.</li>
+                        <li><strong>HSV Color Histograms (10%):</strong> Color profiles matching.</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="feature-card" style="text-align: left; padding: 2rem; border-color: rgba(155, 89, 182, 0.2);">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🌐</div>
+                <h4 class="feature-title" style="color: #9b59b6; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">3. AI Web Source Detection</h4>
+                <p class="feature-desc" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                    Scans uploaded text or visual documents against live web indices:
+                    <ul style="padding-left: 1.25rem; margin-top: 0.5rem; color: var(--text-secondary);">
+                        <li><strong>API Web Search Crawlers:</strong> Queries via Tavily API / SerpAPI.</li>
+                        <li><strong>Title & Metadata Heuristics:</strong> Auto-extracts titles, keywords, headings.</li>
+                        <li><strong>Reliability Indexes:</strong> Auto-categorizes journals (arXiv, ResearchGate) vs. blogs.</li>
+                    </ul>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="about-section" style="margin-bottom: 3rem;">
+        <h3 class="section-title" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">🛠️ Technology Stack</h3>
+        <div class="tech-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">🐍</div>Python 3</div>
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">🔥</div>Flask</div>
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">💾</div>SQLite 3</div>
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">👁️</div>OpenCV 4</div>
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">📝</div>Tesseract OCR</div>
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">🧠</div>Sentence-BERT</div>
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">📄</div>PyMuPDF</div>
+            <div class="tech-item"><div class="tech-icon" style="font-size: 1.5rem; margin-bottom: 0.25rem;">🌐</div>Tavily Search</div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="about-section" style="margin-bottom: 3rem;">
+        <h3 class="section-title" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">⚙️ How It Works</h3>
+        <ol style="color:var(--text-secondary); line-height:2.2; padding-left:1.5rem; margin-top: 1rem;">
+            <li>Select a comparison mode based on document type (Text, Visual, Web-backed).</li>
+            <li>Upload digital files or paste raw inputs. For images/PDFs, OpenCV filters denoise and align images prior to PyMuPDF and Tesseract OCR text extraction.</li>
+            <li>The similarity pipelines execute weightings (NLP vectorizers, SBERT embedding vectors, or HSV/dHash structural layout metrics).</li>
+            <li>Calculated results are compiled and indexed into database records.</li>
+            <li>A comprehensive similarity breakdown report is generated, logging unread notifications for safety metrics.</li>
+        </ol>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/select" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, var(--accent-red), #c0392b);">🚀 Start Analyzing Now</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multi-Modal Plagiarism Detection System — Detect plagiarism in text and code using AI-powered analysis.">
+    <title>{% block title %}Plagiarism Detector{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Background -->
+    <div class="page-bg"></div>
+    <div class="particles">
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
+    </div>
+
+    {% if not hide_sidebar %}
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="nav-brand">
+                <span class="nav-brand-icon">🔍</span>
+                <span class="nav-brand-text">PlagiarismAI</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle menu">
+                ☰
+            </button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+            <li><a href="/login"><span class="nav-icon">🔐</span><span class="nav-text">Login</span></a></li>
+            <li><a href="/select"><span class="nav-icon">✨</span><span class="nav-text">Detect</span></a></li>
+            <li><a href="/dashboard"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a></li>
+            <li><a href="/history"><span class="nav-icon">📜</span><span class="nav-text">History</span></a></li>
+            <li><a href="/admin"><span class="nav-icon">⚙️</span><span class="nav-text">Admin</span></a></li>
+            <li><a href="/about"><span class="nav-icon">ℹ️</span><span class="nav-text">About</span></a></li>
+            <li class="nav-logout-item"><a href="/logout"><span class="nav-icon">🚪</span><span class="nav-text">Logout</span></a></li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    <div class="{% if hide_sidebar %}content-full{% else %}content-wrapper{% endif %}" id="content-wrapper">
+
+    {% if not hide_sidebar %}
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="topbar-left" style="display:flex; align-items:center; gap:1.2rem;">
+            <!-- Global Back Button -->
+            {% if request.path != '/' and request.path != '/select' %}
+            <button onclick="goBack()" class="btn btn-secondary btn-sm back-button-global" 
+                    style="padding:0.4rem 0.8rem; border-radius:var(--radius-sm); font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; height:32px; width:36px; border-color: rgba(255,255,255,0.08);"
+                    title="Go Back">
+                ←
+            </button>
+            {% endif %}
+
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumbs-nav" aria-label="Breadcrumb" style="font-size:0.82rem; font-weight:600; color:var(--text-muted); display:flex; align-items:center;">
+                <a href="/" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">Home</a>
+                
+                {% if request.path == '/select' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Detect</span>
+                {% elif request.path == '/text-document-compare' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/select" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">Detect</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Text Document Comparison</span>
+                {% elif request.path == '/visual-document-compare' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/select" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">Detect</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Visual Document Comparison</span>
+                {% elif request.path == '/web-source-detection' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/select" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">Detect</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">AI Web Source Detection</span>
+                {% elif request.path == '/web-text-compare' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/select" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">Detect</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/web-source-detection" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">AI Web Source Detection</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Text Document from Web</span>
+                {% elif request.path == '/web-visual-compare' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/select" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">Detect</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/web-source-detection" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">AI Web Source Detection</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Visual Document from Web</span>
+                {% elif request.path.startswith('/result/') %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/history" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">History</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Result</span>
+                {% elif request.path.startswith('/report/') %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <a href="/history" style="color:var(--text-muted); text-decoration:none; transition:color 0.2s;">History</a>
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Audit Report</span>
+                {% elif request.path == '/history' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">History</span>
+                {% elif request.path == '/dashboard' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Dashboard</span>
+                {% elif request.path == '/about' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">About</span>
+                {% elif request.path == '/admin' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Admin</span>
+                {% elif request.path == '/profile' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Profile</span>
+                {% elif request.path == '/settings' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Settings</span>
+                {% elif request.path == '/notifications' %}
+                    <span style="margin: 0 0.4rem; color: rgba(255,255,255,0.15);">/</span>
+                    <span style="color:#fff;">Notifications</span>
+                {% endif %}
+            </nav>
+        </div>
+
+        <!-- Sticky Top Navigation Bar (Always visible on desktop) -->
+        <div class="topbar-center desktop-nav-bar" style="display: flex; gap: 1.5rem; align-items: center;">
+            <a href="/" class="topbar-nav-link" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 0.25rem 0.2rem; transition: var(--transition);">Home</a>
+            <a href="/select" class="topbar-nav-link" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 0.25rem 0.2rem; transition: var(--transition);">Detect</a>
+            <a href="/dashboard" class="topbar-nav-link" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 0.25rem 0.2rem; transition: var(--transition);">Dashboard</a>
+            <a href="/history" class="topbar-nav-link" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 0.25rem 0.2rem; transition: var(--transition);">History</a>
+            <a href="/about" class="topbar-nav-link" style="color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 0.25rem 0.2rem; transition: var(--transition);">About</a>
+        </div>
+        <div class="topbar-right">
+            <div class="notification-dropdown" style="position:relative;">
+                <button class="topbar-icon-btn" id="notification-toggle" aria-label="Notifications">
+                    <span class="nav-icon">🔔</span>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </button>
+                <div class="dropdown-menu" id="notification-menu" style="width:300px;">
+                    <div class="dropdown-header" style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--glass-border); font-weight:600; display:flex; justify-content:space-between; align-items:center;">
+                        <span>Notifications</span>
+                        {% if unread_notifications_count > 0 or recent_notifications %}
+                        <a href="/notifications/clear" style="font-size: 0.75rem; color: var(--accent-red); padding:0; margin:0; background:none; text-decoration:none; border:none; display:inline;">Clear All</a>
+                        {% endif %}
+                    </div>
+                    <div class="notification-list" style="max-height: 250px; overflow-y: auto;">
+                        {% if recent_notifications %}
+                            {% for notif in recent_notifications %}
+                            <div class="notification-item {% if notif.is_read %}read{% else %}unread{% endif %}" style="padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; transition: background 0.2s;">
+                                <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                                    <span style="font-size: 0.9rem; margin-top: 2px;">
+                                        {% if notif.category == 'success' %}🟢
+                                        {% elif notif.category == 'warning' %}⚠️
+                                        {% else %}ℹ️
+                                        {% endif %}
+                                    </span>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <span class="notif-message" style="font-size: 0.82rem; color: var(--text-primary); line-height: 1.3; font-weight: {% if notif.is_read %}400{% else %}600{% endif %};">{{ notif.message }}</span>
+                                        <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">{{ notif.created_at }}</span>
+                                    </div>
+                                </div>
+                                {% if not notif.is_read %}
+                                <a href="/notifications/read/{{ notif.id }}" class="mark-read-btn" title="Mark as read" style="padding: 0.25rem; font-size: 0.8rem; text-decoration: none; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--accent-green);">✓</a>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="padding: 1.5rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No notifications yet.</div>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown-divider" style="margin:0;"></div>
+                    <a href="/notifications" style="justify-content:center; color:var(--text-secondary); font-size:0.8rem; padding: 0.5rem; text-align:center;">View All Notifications</a>
+                </div>
+            </div>
+            <div class="profile-dropdown">
+                <button class="profile-btn" id="profile-toggle">
+                    <div class="profile-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <span class="profile-name">{{ session.get('user_name', 'Guest') }}</span>
+                    <span class="profile-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <a href="/profile"><span class="nav-icon">👤</span> My Profile</a>
+                    <a href="/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+                    <a href="/history"><span class="nav-icon">📜</span> My History</a>
+                    <a href="/history"><span class="nav-icon">📋</span> Reports</a>
+                    <a href="/settings"><span class="nav-icon">⚙️</span> Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/logout" class="text-danger"><span class="nav-icon">🚪</span> Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Multi-Modal Plagiarism Detection System. Academic Research Project.</p>
+    </footer>
+
+    {% if not hide_sidebar %}
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav" style="display:none; position:fixed; bottom:0; left:0; right:0; height:60px; background:rgba(10, 10, 26, 0.95); backdrop-filter:blur(20px); border-top:1px solid var(--glass-border); z-index:90; justify-content:space-around; align-items:center; padding: 0.2rem 1rem;">
+        <a href="/" class="mobile-nav-item" style="display:flex; flex-direction:column; align-items:center; text-decoration:none; color:var(--text-secondary); font-size:0.75rem; font-weight:600; transition:var(--transition); gap:2px;">
+            <span style="font-size:1.25rem;">🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="/select" class="mobile-nav-item" style="display:flex; flex-direction:column; align-items:center; text-decoration:none; color:var(--text-secondary); font-size:0.75rem; font-weight:600; transition:var(--transition); gap:2px;">
+            <span style="font-size:1.25rem;">🔍</span>
+            <span>Detect</span>
+        </a>
+        <a href="/dashboard" class="mobile-nav-item" style="display:flex; flex-direction:column; align-items:center; text-decoration:none; color:var(--text-secondary); font-size:0.75rem; font-weight:600; transition:var(--transition); gap:2px;">
+            <span style="font-size:1.25rem;">📊</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="/history" class="mobile-nav-item" style="display:flex; flex-direction:column; align-items:center; text-decoration:none; color:var(--text-secondary); font-size:0.75rem; font-weight:600; transition:var(--transition); gap:2px;">
+            <span style="font-size:1.25rem;">📜</span>
+            <span>History</span>
+        </a>
+        <a href="/profile" class="mobile-nav-item" style="display:flex; flex-direction:column; align-items:center; text-decoration:none; color:var(--text-secondary); font-size:0.75rem; font-weight:600; transition:var(--transition); gap:2px;">
+            <span style="font-size:1.25rem;">👤</span>
+            <span>Profile</span>
+        </a>
+    </nav>
+    {% endif %}
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+    function goBack() {
+        if (document.referrer && document.referrer.includes(window.location.host)) {
+            window.history.back();
+        } else {
+            window.location.href = "/select";
+        }
+    }
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Esc -> Go Back
+        if (e.key === 'Escape') {
+            const activeEl = document.activeElement;
+            if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+                return;
+            }
+            goBack();
+        }
+        
+        // Ctrl combinations
+        if (e.ctrlKey) {
+            if (e.key === 'n' || e.key === 'N') {
+                e.preventDefault();
+                window.location.href = "/select";
+            } else if (e.key === 'h' || e.key === 'H') {
+                e.preventDefault();
+                window.location.href = "/history";
+            } else if (e.key === 'd' || e.key === 'D') {
+                e.preventDefault();
+                window.location.href = "/dashboard";
+            }
+        }
+    });
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

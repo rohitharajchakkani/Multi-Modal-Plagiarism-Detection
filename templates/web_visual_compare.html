@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Visual Web Source Detection — PlagiarismAI{% endblock %}
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="/web-source-detection" style="text-decoration: none; color: var(--text-muted); font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.2s;">
+            ← Back to Web Detection Choices
+        </a>
+    </div>
+
+    <!-- Header -->
+    <div class="glass-card glass-card-lg" style="position: relative; overflow: hidden; margin-bottom: 2rem;">
+        <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: #e74c3c; border-radius: 50%; filter: blur(80px); opacity: 0.25; z-index: -1;"></div>
+        <h1 class="page-title" style="font-size: 2rem; background: linear-gradient(135deg, #fff 30%, #a5a5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Visual Document from Web</h1>
+        <p class="page-subtitle" style="color: var(--text-muted);">Extract text from visual documents via OCR and perform real-time web verification.</p>
+    </div>
+
+    <!-- Alert about API key state -->
+    {% if api_key_warning %}
+    <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid var(--accent-red); border-radius: var(--radius-md); padding: 1rem 1.5rem; margin-bottom: 2rem; color: #fff; display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">⚠️</span>
+        <div>
+            <div style="font-weight: bold; color: var(--accent-red);">Web Search API Key Missing</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">{{ api_key_warning }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Input Form -->
+    <div class="glass-card glass-card-lg">
+        <form method="POST" action="/web-visual-compare" enctype="multipart/form-data" id="web-visual-form" onsubmit="showProgressBar(event)">
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; display: block;">🖼️ Upload Visual Document</label>
+                <div class="batch-drop-zone" id="web-visual-drop-zone" style="border: 2px dashed var(--glass-border); border-radius: var(--radius-lg); padding: 3rem 1.5rem; text-align: center; background: rgba(255,255,255,0.01); transition: all 0.3s ease; cursor: pointer; position: relative;">
+                    <div class="batch-drop-icon" style="font-size: 2.5rem; margin-bottom: 0.8rem;">📤</div>
+                    <div class="batch-drop-title" style="font-weight: 600;">Drag & Drop visual file here</div>
+                    <div class="batch-drop-sub" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">PNG, JPG, JPEG, PDF supported</div>
+                    
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; position: relative; z-index: 10;">
+                        <button type="button" id="upload-image-btn" class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15);">🖼️ Upload Image</button>
+                        <button type="button" id="upload-pdf-btn" class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15);">📄 Upload PDF</button>
+                    </div>
+                    
+                    <input type="file" name="file" id="web-visual-file" class="batch-file-input" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;" accept=".jpg,.jpeg,.png,.pdf" required>
+                </div>
+                <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                    <div id="web-visual-file-name" style="font-weight: bold; color: var(--accent-red);"></div>
+                    <button type="button" id="clear-visual-file-btn" class="btn btn-secondary btn-sm" style="display: none; padding: 0.2rem 0.6rem; font-size: 0.75rem;">❌ Clear File</button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="loading-area" style="display: none; margin-top: 2rem;">
+                <div id="loading-message" style="text-align: center; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">
+                    Running OCR Text Extraction & querying search index... (This may take a minute)
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                    <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-red), #9b59b6); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <div class="flex-center mt-3" id="submit-area" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="/web-source-detection" class="btn btn-secondary btn-lg" style="display: flex; align-items: center; gap: 0.4rem;">← Back</a>
+                <button type="button" id="reset-visual-form-btn" class="btn btn-secondary btn-lg">🔄 Reset Form</button>
+                <button type="submit" id="web-visual-submit-btn" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, var(--accent-red), #9b59b6); border: none; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);" {% if api_key_warning %}disabled{% endif %} data-loading-text="Running OCR...">
+                    🔍 OCR & Search Online
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.batch-drop-zone.dragover {
+    border-color: var(--accent-red) !important;
+    background: rgba(231, 76, 60, 0.05) !important;
+}
+.batch-drop-zone:hover {
+    border-color: rgba(255,255,255,0.25) !important;
+    background: rgba(255,255,255,0.03) !important;
+}
+</style>
+
+<script>
+function showProgressBar(event) {
+    const fileInput = document.getElementById('web-visual-file');
+    if (fileInput.files.length === 0) {
+        return; // HTML5 required check
+    }
+
+    document.getElementById('submit-area').style.display = 'none';
+    const loadingArea = document.getElementById('loading-area');
+    loadingArea.style.display = 'block';
+    
+    const submitBtn = document.getElementById('web-visual-submit-btn');
+    const loadingMsg = document.getElementById('loading-message');
+    if (submitBtn && loadingMsg) {
+        const loadingText = submitBtn.getAttribute('data-loading-text') || "Running OCR...";
+        loadingMsg.textContent = loadingText;
+    }
+    
+    let progress = 0;
+    const bar = document.getElementById('progress-bar');
+    const interval = setInterval(() => {
+        progress += Math.random() * 4 + 1.2;
+        if (progress > 94) {
+            progress = 94;
+            clearInterval(interval);
+        }
+        bar.style.width = progress + '%';
+    }, 600);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('web-visual-drop-zone');
+    const fileInput = document.getElementById('web-visual-file');
+    const nameDiv = document.getElementById('web-visual-file-name');
+    const clearFileBtn = document.getElementById('clear-visual-file-btn');
+    const resetFormBtn = document.getElementById('reset-visual-form-btn');
+    const uploadImageBtn = document.getElementById('upload-image-btn');
+    const uploadPdfBtn = document.getElementById('upload-pdf-btn');
+
+    ['dragenter','dragover','dragleave','drop'].forEach(e => {
+        dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+    });
+    ['dragenter','dragover'].forEach(e => {
+        dropZone.addEventListener(e, () => dropZone.classList.add('dragover'), false);
+    });
+    ['dragleave','drop'].forEach(e => {
+        dropZone.addEventListener(e, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        fileInput.files = e.dataTransfer.files;
+        updateFileName();
+    });
+
+    fileInput.addEventListener('change', updateFileName);
+
+    function updateFileName() {
+        if (fileInput.files.length > 0) {
+            nameDiv.textContent = 'Selected File: ' + fileInput.files[0].name;
+            clearFileBtn.style.display = 'inline-block';
+        } else {
+            nameDiv.textContent = '';
+            clearFileBtn.style.display = 'none';
+        }
+    }
+
+    if (clearFileBtn) {
+        clearFileBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            updateFileName();
+        });
+    }
+
+    if (resetFormBtn) {
+        resetFormBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            updateFileName();
+        });
+    }
+
+    if (uploadImageBtn) {
+        uploadImageBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Stop trigger on drop-zone itself
+            fileInput.setAttribute('accept', '.jpg,.jpeg,.png');
+            fileInput.click();
+        });
+    }
+
+    if (uploadPdfBtn) {
+        uploadPdfBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Stop trigger on drop-zone itself
+            fileInput.setAttribute('accept', '.pdf');
+            fileInput.click();
+        });
+    }
+});
+</script>
+{% endblock %}

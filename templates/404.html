@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found — PlagiarismAI{% endblock %}
+{% block content %}
+<div class="glass-card glass-card-lg" style="text-align: center; padding: 4rem 2rem; max-width: 600px; margin: 4rem auto; animation: fadeInUp 0.6s ease-out both;">
+    <div style="font-size: 5rem; margin-bottom: 1.5rem; animation: pulse 2s infinite;">🔍</div>
+    <h1 class="page-title" style="font-size: 2.6rem; background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">404 Error</h1>
+    <h2 style="color: #fff; margin-bottom: 1.25rem; font-size: 1.6rem; font-weight: 800;">Page Not Found</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2.5rem; line-height: 1.6; font-size: 1rem;">
+        The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+    </p>
+    
+    <div class="flex-center" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/" class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-red), #c0392b); padding: 0.8rem 1.85rem; font-weight: bold; border-radius: var(--radius-md);">🏠 Go Home</a>
+        <button onclick="goBack()" class="btn btn-secondary" style="padding: 0.8rem 1.85rem; font-weight: bold; border-radius: var(--radius-md);">← Go Back</button>
+        <a href="/dashboard" class="btn btn-secondary" style="padding: 0.8rem 1.85rem; font-weight: bold; border-radius: var(--radius-md); border-color: rgba(0, 176, 255, 0.3); color: var(--accent-blue);">📊 Open Dashboard</a>
+    </div>
+</div>
+{% endblock %}

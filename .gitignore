@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+plagiarism.db
+plagiarism.db-journal
+*.sqlite
+*.db
+
+# Environment variables (contains private credentials/keys)
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env*.local
+
+# Virtual environment files
+venv/
+.venv/
+env/
+ENV/
+
+# Temporary uploads (ignore contents but keep folder structure if preferred)
+uploads/*
+!uploads/.gitkeep
+
+# IDE configuration files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.bak
+*.tmp

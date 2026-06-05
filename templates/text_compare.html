@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Text Comparison — PlagiarismAI{% endblock %}
+{% block content %}
+<div class="glass-card glass-card-lg" style="position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent-blue); border-radius: 50%; filter: blur(80px); opacity: 0.3; z-index: -1;"></div>
+    <div style="position: absolute; bottom: -50px; left: -50px; width: 150px; height: 150px; background: var(--accent-purple); border-radius: 50%; filter: blur(80px); opacity: 0.3; z-index: -1;"></div>
+    
+    <h1 class="page-title">Text Comparison</h1>
+    <p class="page-subtitle">Enter two text passages below to check for plagiarism using smart preprocessing &amp; realistic thresholds.</p>
+
+    <form method="POST" action="/text-compare" id="text-compare-form" onsubmit="showProgressBar()">
+        <div class="input-grid">
+            <div class="form-group">
+                <label class="form-label" for="text1">📄 Text 1 (Original)</label>
+                <textarea class="form-textarea" id="text1" name="text1" placeholder="Paste the original text here..." style="background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);" required>{{ request.form.get('text1', '') }}</textarea>
+                <div class="char-count">0 characters</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="text2">📄 Text 2 (Comparison)</label>
+                <textarea class="form-textarea" id="text2" name="text2" placeholder="Paste the text to compare..." style="background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);" required>{{ request.form.get('text2', '') }}</textarea>
+                <div class="char-count">0 characters</div>
+            </div>
+        </div>
+        
+        <!-- Progress Bar (Hidden by default) -->
+        <div id="loading-area" style="display: none; margin-top: 20px;">
+            <div style="text-align: center; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">Analyzing Texts...</div>
+            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+        
+        <div class="flex-center mt-3" id="submit-area">
+            <button type="button" class="btn btn-secondary" id="try-text-example">💡 Try Example</button>
+            <button type="submit" class="btn btn-primary btn-lg" id="submit-text">🔍 Compare Texts</button>
+        </div>
+    </form>
+</div>
+<script>
+function showProgressBar() {
+    document.getElementById('submit-area').style.display = 'none';
+    const loadingArea = document.getElementById('loading-area');
+    loadingArea.style.display = 'block';
+    
+    let progress = 0;
+    const bar = document.getElementById('progress-bar');
+    const interval = setInterval(() => {
+        progress += Math.random() * 15 + 5;
+        if (progress > 90) {
+            progress = 90;
+            clearInterval(interval);
+        }
+        bar.style.width = progress + '%';
+    }, 300);
+}
+</script>
+
+<!-- Batch Multi-File Upload Section -->
+<div class="glass-card glass-card-lg" style="margin-top: 2rem;">
+    <h2 class="page-title" style="font-size:1.4rem;">📁 Batch Comparison — Multiple Files</h2>
+    <p class="page-subtitle">Upload multiple text files from different people to cross-check plagiarism across all submissions.</p>
+
+    <form method="POST" action="/batch-text-compare" enctype="multipart/form-data" id="batch-text-form">
+        <div class="batch-drop-zone" id="batch-drop-zone">
+            <div class="batch-drop-icon">📤</div>
+            <div class="batch-drop-title">Drag & Drop multiple text files here</div>
+            <div class="batch-drop-sub">or click to browse — Minimum 2 files required (.txt, .md, .csv, etc.)</div>
+            <input type="file" name="files[]" id="batch-file-input" class="batch-file-input" multiple accept=".txt,.md,.csv,.log,.text,.doc">
+        </div>
+
+        <div class="batch-file-list" id="batch-file-list" style="display:none;">
+            <div class="batch-file-header">
+                <span class="batch-file-count" id="batch-file-count">0 files selected</span>
+                <button type="button" class="btn btn-secondary" id="batch-clear-btn" style="padding:0.4rem 1rem; font-size:0.85rem;">✕ Clear</button>
+            </div>
+            <div class="batch-file-items" id="batch-file-items"></div>
+        </div>
+
+        <div class="flex-center mt-3">
+            <button type="submit" class="btn btn-primary btn-lg" id="batch-submit-btn" disabled>
+                🔍 Compare All Files
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.batch-drop-zone{border:2px dashed var(--glass-border);border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:rgba(255,255,255,0.02);transition:all 0.3s ease;cursor:pointer;position:relative;overflow:hidden}
+.batch-drop-zone.dragover{border-color:var(--accent-red);background:rgba(231,76,60,0.05)}
+.batch-drop-zone:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.03)}
+.batch-drop-icon{font-size:2.5rem;margin-bottom:0.8rem;transition:transform 0.3s}
+.batch-drop-zone:hover .batch-drop-icon,.batch-drop-zone.dragover .batch-drop-icon{transform:translateY(-5px)}
+.batch-drop-title{font-size:1.1rem;font-weight:600;color:var(--text-primary);margin-bottom:0.4rem}
+.batch-drop-sub{font-size:0.85rem;color:var(--text-muted)}
+.batch-file-input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.batch-file-list{margin-top:1.5rem;background:rgba(0,0,0,0.15);border:1px solid var(--glass-border);border-radius:var(--radius-md);overflow:hidden}
+.batch-file-header{display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06)}
+.batch-file-count{font-weight:600;font-size:0.9rem}
+.batch-file-items{max-height:200px;overflow-y:auto}
+.batch-file-item{display:flex;align-items:center;gap:0.8rem;padding:0.6rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.9rem}
+.batch-file-item:last-child{border-bottom:none}
+.batch-file-item .file-icon{font-size:1.1rem;color:var(--text-muted)}
+.batch-file-item .file-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.batch-file-item .file-size{color:var(--text-muted);font-size:0.8rem}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('batch-drop-zone');
+    const fileInput = document.getElementById('batch-file-input');
+    const fileList = document.getElementById('batch-file-list');
+    const fileItems = document.getElementById('batch-file-items');
+    const fileCount = document.getElementById('batch-file-count');
+    const clearBtn = document.getElementById('batch-clear-btn');
+    const submitBtn = document.getElementById('batch-submit-btn');
+
+    // Drag events
+    ['dragenter','dragover','dragleave','drop'].forEach(e => {
+        dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+    });
+    ['dragenter','dragover'].forEach(e => {
+        dropZone.addEventListener(e, () => dropZone.classList.add('dragover'), false);
+    });
+    ['dragleave','drop'].forEach(e => {
+        dropZone.addEventListener(e, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        fileInput.files = e.dataTransfer.files;
+        updateFileList(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', function() {
+        updateFileList(this.files);
+    });
+
+    clearBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        fileList.style.display = 'none';
+        fileItems.innerHTML = '';
+        submitBtn.disabled = true;
+    });
+
+    function updateFileList(files) {
+        if (!files || files.length === 0) return;
+        fileList.style.display = 'block';
+        fileItems.innerHTML = '';
+        fileCount.textContent = files.length + ' file' + (files.length > 1 ? 's' : '') + ' selected';
+        submitBtn.disabled = files.length < 2;
+
+        Array.from(files).forEach(f => {
+            const sizeKB = (f.size / 1024).toFixed(1);
+            fileItems.insertAdjacentHTML('beforeend',
+                '<div class="batch-file-item">' +
+                '  <span class="file-icon">📄</span>' +
+                '  <span class="file-name">' + f.name + '</span>' +
+                '  <span class="file-size">' + sizeKB + ' KB</span>' +
+                '</div>'
+            );
+        });
+    }
+});
+</script>
+{% endblock %}

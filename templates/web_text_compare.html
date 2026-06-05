@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Text Web Source Detection — PlagiarismAI{% endblock %}
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="/web-source-detection" style="text-decoration: none; color: var(--text-muted); font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.2s;">
+            ← Back to Web Detection Choices
+        </a>
+    </div>
+
+    <!-- Header -->
+    <div class="glass-card glass-card-lg" style="position: relative; overflow: hidden; margin-bottom: 2rem;">
+        <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: #9b59b6; border-radius: 50%; filter: blur(80px); opacity: 0.25; z-index: -1;"></div>
+        <h1 class="page-title" style="font-size: 2rem; background: linear-gradient(135deg, #fff 30%, #a5a5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Text Document from Web</h1>
+        <p class="page-subtitle" style="color: var(--text-muted);">Perform live search matching against online publications, portals, blogs, and Wikipedia.</p>
+    </div>
+
+    <!-- Alert about API key state -->
+    {% if api_key_warning %}
+    <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid var(--accent-red); border-radius: var(--radius-md); padding: 1rem 1.5rem; margin-bottom: 2rem; color: #fff; display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">⚠️</span>
+        <div>
+            <div style="font-weight: bold; color: var(--accent-red);">Web Search API Key Missing</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">{{ api_key_warning }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Input Form -->
+    <div class="glass-card glass-card-lg">
+        <form method="POST" action="/web-text-compare" enctype="multipart/form-data" id="web-text-form" onsubmit="showProgressBar(event)">
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; display: block;">📁 Upload Text Document</label>
+                <div class="batch-drop-zone" id="web-drop-zone" style="border: 2px dashed var(--glass-border); border-radius: var(--radius-lg); padding: 2.5rem 1.5rem; text-align: center; background: rgba(255,255,255,0.01); transition: all 0.3s ease; cursor: pointer; position: relative;">
+                    <div class="batch-drop-icon" style="font-size: 2rem; margin-bottom: 0.5rem;">📤</div>
+                    <div class="batch-drop-title" style="font-weight: 600; font-size: 1rem;">Drag & Drop document here</div>
+                    <div class="batch-drop-sub" style="font-size: 0.8rem; color: var(--text-muted);">TXT, PDF, DOC, DOCX supported (Optional - overrides pasted text)</div>
+                    <input type="file" name="file" id="web-file-input" class="batch-file-input" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;" accept=".txt,.pdf,.doc,.docx">
+                </div>
+                <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                    <div id="web-file-name" style="font-weight: bold; color: #9b59b6;"></div>
+                    <button type="button" id="clear-file-btn" class="btn btn-secondary btn-sm" style="display: none; padding: 0.2rem 0.6rem; font-size: 0.75rem;">❌ Clear File</button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <label class="form-label" for="pasted-text" style="font-weight: 600; color: #fff; margin: 0; display: block;">✍️ Pasted Text</label>
+                    <button type="button" id="paste-sample-btn" class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;">📋 Paste Sample Text</button>
+                </div>
+                <textarea class="form-textarea" id="pasted-text" name="text" placeholder="Or paste the content you want to check against web resources..." style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 1rem; width: 100%; min-height: 250px; color: #fff; resize: vertical;"></textarea>
+                <div class="char-count" style="text-align: right; font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">0 characters</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="loading-area" style="display: none; margin-top: 2rem;">
+                <div id="loading-message" style="text-align: center; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">Generating queries & performing live search crawl...</div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                    <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #9b59b6, #3498db); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <div class="flex-center mt-3" id="submit-area" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="/web-source-detection" class="btn btn-secondary btn-lg" style="display: flex; align-items: center; gap: 0.4rem;">← Back</a>
+                <button type="button" id="reset-form-btn" class="btn btn-secondary btn-lg">🔄 Reset Form</button>
+                <button type="submit" id="web-text-submit-btn" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #9b59b6, #3498db); border: none; box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);" {% if api_key_warning %}disabled{% endif %} data-loading-text="Searching Web Sources...">
+                    🔍 Scan Online Sources
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.batch-drop-zone.dragover {
+    border-color: #9b59b6 !important;
+    background: rgba(155, 89, 182, 0.05) !important;
+}
+.batch-drop-zone:hover {
+    border-color: rgba(255,255,255,0.25) !important;
+    background: rgba(255,255,255,0.03) !important;
+}
+</style>
+
+<script>
+function showProgressBar(event) {
+    const fileInput = document.getElementById('web-file-input');
+    const textArea = document.getElementById('pasted-text');
+    
+    // Simple verification before showing progress bar
+    if (fileInput.files.length === 0 && (!textArea.value || !textArea.value.trim())) {
+        return; // Let browser HTML5 validation handle required field
+    }
+
+    document.getElementById('submit-area').style.display = 'none';
+    const loadingArea = document.getElementById('loading-area');
+    loadingArea.style.display = 'block';
+    
+    const submitBtn = document.getElementById('web-text-submit-btn');
+    const loadingMsg = document.getElementById('loading-message');
+    if (submitBtn && loadingMsg) {
+        const loadingText = submitBtn.getAttribute('data-loading-text') || "Searching Web Sources...";
+        loadingMsg.textContent = loadingText;
+    }
+    
+    let progress = 0;
+    const bar = document.getElementById('progress-bar');
+    const interval = setInterval(() => {
+        progress += Math.random() * 5 + 1.5;
+        if (progress > 93) {
+            progress = 93;
+            clearInterval(interval);
+        }
+        bar.style.width = progress + '%';
+    }, 500);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('web-drop-zone');
+    const fileInput = document.getElementById('web-file-input');
+    const nameDiv = document.getElementById('web-file-name');
+    const textArea = document.getElementById('pasted-text');
+    const clearFileBtn = document.getElementById('clear-file-btn');
+    const pasteSampleBtn = document.getElementById('paste-sample-btn');
+    const resetFormBtn = document.getElementById('reset-form-btn');
+
+    ['dragenter','dragover','dragleave','drop'].forEach(e => {
+        dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+    });
+    ['dragenter','dragover'].forEach(e => {
+        dropZone.addEventListener(e, () => dropZone.classList.add('dragover'), false);
+    });
+    ['dragleave','drop'].forEach(e => {
+        dropZone.addEventListener(e, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        fileInput.files = e.dataTransfer.files;
+        updateFileName();
+    });
+
+    fileInput.addEventListener('change', updateFileName);
+
+    function updateFileName() {
+        if (fileInput.files.length > 0) {
+            nameDiv.textContent = 'Selected File: ' + fileInput.files[0].name;
+            textArea.removeAttribute('required');
+            clearFileBtn.style.display = 'inline-block';
+        } else {
+            nameDiv.textContent = '';
+            textArea.setAttribute('required', 'required');
+            clearFileBtn.style.display = 'none';
+        }
+    }
+
+    if (clearFileBtn) {
+        clearFileBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            updateFileName();
+        });
+    }
+
+    if (pasteSampleBtn) {
+        pasteSampleBtn.addEventListener('click', function() {
+            textArea.value = "Multi-modal plagiarism detection platforms typically process documents through diverse pathways. Natural language processing models evaluate syntactic and semantic similarity of textual elements using techniques like TF-IDF, Cosine word vector overlap, and deep learning sentence transformer embeddings. For layout analysis, computer vision algorithms run structure analysis and image hashing.";
+            textArea.dispatchEvent(new Event('input'));
+        });
+    }
+
+    if (resetFormBtn) {
+        resetFormBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            textArea.value = '';
+            updateFileName();
+            textArea.dispatchEvent(new Event('input'));
+        });
+    }
+
+    // Set text required initially
+    textArea.setAttribute('required', 'required');
+});
+</script>
+{% endblock %}

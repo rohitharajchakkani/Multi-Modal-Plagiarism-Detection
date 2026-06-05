@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Handwritten Assignment Comparison — PlagiarismAI{% endblock %}
+{% block content %}
+<div class="glass-card glass-card-lg" style="position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: var(--accent-red); border-radius: 50%; filter: blur(100px); opacity: 0.2; z-index: -1;"></div>
+    <div style="position: absolute; bottom: -50px; right: -50px; width: 200px; height: 200px; background: var(--accent-blue); border-radius: 50%; filter: blur(100px); opacity: 0.2; z-index: -1;"></div>
+    
+    <h1 class="page-title">Handwritten Assignment Comparison</h1>
+    <p class="page-subtitle">Upload handwritten assignments (Images or PDFs). The system will use OCR to extract text and compare them.</p>
+
+    <form method="POST" action="/handwritten-compare" enctype="multipart/form-data" id="handwritten-compare-form" onsubmit="showProgressBar()">
+        <div class="input-grid" style="gap: 2rem;">
+            <!-- File 1 Drop Zone -->
+            <div class="form-group">
+                <label class="form-label">📝 Assignment 1 (Original)</label>
+                <div class="batch-drop-zone" id="drop-zone-1">
+                    <div class="batch-drop-icon">📤</div>
+                    <div class="batch-drop-title">Drag & Drop File 1 here</div>
+                    <div class="batch-drop-sub">JPG, PNG, PDF supported</div>
+                    <input type="file" name="file1" id="file1-input" class="batch-file-input" accept=".jpg,.jpeg,.png,.pdf" required>
+                </div>
+                <div id="file1-name" style="margin-top: 10px; font-weight: bold; color: var(--accent-blue);"></div>
+            </div>
+            
+            <!-- File 2 Drop Zone -->
+            <div class="form-group">
+                <label class="form-label">📝 Assignment 2 (Comparison)</label>
+                <div class="batch-drop-zone" id="drop-zone-2">
+                    <div class="batch-drop-icon">📤</div>
+                    <div class="batch-drop-title">Drag & Drop File 2 here</div>
+                    <div class="batch-drop-sub">JPG, PNG, PDF supported</div>
+                    <input type="file" name="file2" id="file2-input" class="batch-file-input" accept=".jpg,.jpeg,.png,.pdf" required>
+                </div>
+                <div id="file2-name" style="margin-top: 10px; font-weight: bold; color: var(--accent-red);"></div>
+            </div>
+        </div>
+        
+        <!-- Progress Bar (Hidden by default) -->
+        <div id="loading-area" style="display: none; margin-top: 2rem;">
+            <div style="text-align: center; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">
+                Extracting Text & Analyzing... (This may take a minute)
+            </div>
+            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-red), var(--accent-blue)); transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <div class="flex-center mt-3" id="submit-area">
+            <button type="submit" class="btn btn-primary btn-lg" id="submit-handwritten">🔍 Run OCR & Compare</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.batch-drop-zone {
+    border: 2px dashed var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 3rem 1rem;
+    text-align: center;
+    background: rgba(255,255,255,0.02);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+.batch-drop-zone.dragover {
+    border-color: var(--accent-blue);
+    background: rgba(52, 152, 219, 0.05);
+}
+.batch-drop-zone:hover {
+    border-color: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.03);
+}
+.batch-drop-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+    transition: transform 0.3s;
+}
+.batch-drop-zone:hover .batch-drop-icon,
+.batch-drop-zone.dragover .batch-drop-icon {
+    transform: translateY(-5px);
+}
+.batch-drop-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+}
+.batch-drop-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.batch-file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function setupDropZone(dropZoneId, inputId, nameId) {
+        const dropZone = document.getElementById(dropZoneId);
+        const fileInput = document.getElementById(inputId);
+        const nameDiv = document.getElementById(nameId);
+
+        ['dragenter','dragover','dragleave','drop'].forEach(e => {
+            dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+        });
+        ['dragenter','dragover'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.add('dragover'), false);
+        });
+        ['dragleave','drop'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileName();
+        });
+
+        fileInput.addEventListener('change', updateFileName);
+
+        function updateFileName() {
+            if (fileInput.files.length > 0) {
+                nameDiv.textContent = 'Selected: ' + fileInput.files[0].name;
+            } else {
+                nameDiv.textContent = '';
+            }
+        }
+    }
+    
+    setupDropZone('drop-zone-1', 'file1-input', 'file1-name');
+    setupDropZone('drop-zone-2', 'file2-input', 'file2-name');
+});
+
+function showProgressBar() {
+    document.getElementById('submit-area').style.display = 'none';
+    const loadingArea = document.getElementById('loading-area');
+    loadingArea.style.display = 'block';
+    
+    let progress = 0;
+    const bar = document.getElementById('progress-bar');
+    // OCR can be slow, so make the progress bar move slowly up to 95%
+    const interval = setInterval(() => {
+        progress += Math.random() * 5 + 1;
+        if (progress > 95) {
+            progress = 95;
+            clearInterval(interval);
+        }
+        bar.style.width = progress + '%';
+    }, 500);
+}
+</script>
+{% endblock %}

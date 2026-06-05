@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Select Mode — PlagiarismAI{% endblock %}
+{% block content %}
+<h1 class="page-title" style="text-align: center; font-size: 2.2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 30%, #a5a5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Choose Comparison Mode</h1>
+<p class="page-subtitle" style="text-align: center; margin-bottom: 3rem; color: var(--text-muted);">Select the type of content you want to analyze for plagiarism.</p>
+
+<div class="mode-grid" style="max-width:1100px; width:100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin: 0 auto;">
+    <!-- Card 1: Text Document -->
+    <a href="/text-document-compare" class="mode-card" id="mode-text" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; transition: all 0.3s ease; text-decoration: none; position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2.5rem 2rem;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: var(--accent-blue); border-radius: 50%; filter: blur(50px); opacity: 0.2; z-index: -1;"></div>
+        <div>
+            <div class="mode-icon" style="font-size: 3.5rem; margin-bottom: 1.5rem;">📄</div>
+            <h2 class="mode-title" style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">Text Document Comparison</h2>
+            <p class="mode-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                Compare uploaded digital text documents or pasted text with each other using hybrid TF-IDF, Cosine, and Semantic models.
+            </p>
+            <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 1.5rem;">
+                TXT • PDF • DOC • DOCX
+            </div>
+        </div>
+        <span class="btn btn-primary" style="align-self: flex-start; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border: none; padding: 0.7rem 1.5rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; color: #fff;">
+            Start Text Document Check →
+        </span>
+    </a>
+
+    <!-- Card 2: Visual Document -->
+    <a href="/visual-document-compare" class="mode-card" id="mode-visual" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; transition: all 0.3s ease; text-decoration: none; position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2.5rem 2rem;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: var(--accent-red); border-radius: 50%; filter: blur(50px); opacity: 0.2; z-index: -1;"></div>
+        <div>
+            <div class="mode-icon" style="font-size: 3.5rem; margin-bottom: 1.5rem;">🖼️</div>
+            <h2 class="mode-title" style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">Visual Document Comparison</h2>
+            <p class="mode-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                Compare visual academic documents like posters, infographics, scanned assignments, and notes using layout, image hash, color, and OCR.
+            </p>
+            <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-red); margin-bottom: 1.5rem;">
+                POSTERS • INFOGRAPHICS • IMAGES • PDF
+            </div>
+        </div>
+        <span class="btn btn-primary" style="align-self: flex-start; background: linear-gradient(135deg, var(--accent-red), #e67e22); border: none; padding: 0.7rem 1.5rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; color: #fff;">
+            Start Visual Document Check →
+        </span>
+    </a>
+
+    <!-- Card 3: AI-Based Web Source Detection -->
+    <a href="/web-source-detection" class="mode-card" id="mode-web" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; transition: all 0.3s ease; text-decoration: none; position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2.5rem 2rem;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: #9b59b6; border-radius: 50%; filter: blur(50px); opacity: 0.2; z-index: -1;"></div>
+        <div>
+            <div class="mode-icon" style="font-size: 3.5rem; margin-bottom: 1.5rem;">🌐</div>
+            <h2 class="mode-title" style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">AI-Based Web Source Detection</h2>
+            <p class="mode-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                Perform live search scanning against online resources, articles, Wikipedia, and research publications to identify web plagiarism.
+            </p>
+            <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9b59b6; margin-bottom: 1.5rem;">
+                TEXT FROM WEB • VISUAL DOCUMENT FROM WEB
+            </div>
+        </div>
+        <span class="btn btn-primary" style="align-self: flex-start; background: linear-gradient(135deg, #9b59b6, #8e44ad); border: none; padding: 0.7rem 1.5rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; color: #fff;">
+            Start Web Source Detection →
+        </span>
+    </a>
+</div>
+
+<style>
+.mode-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+</style>
+{% endblock %}

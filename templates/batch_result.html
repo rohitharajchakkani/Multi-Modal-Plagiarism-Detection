@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% block title %}Batch {{ mode|title }} Results — PlagiarismAI{% endblock %}
+{% block content %}
+
+<style>
+/* ── Batch Result Page Styles ─────────────────────────── */
+.batch-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+.batch-stat-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-align: center;
+}
+.batch-stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-red), #e67e22);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.batch-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+}
+
+/* ── Heatmap Matrix ──────────────────────────────────── */
+.matrix-wrapper {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+}
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 500px;
+}
+.matrix-table th {
+    background: rgba(0,0,0,0.3);
+    padding: 0.7rem 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.06);
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.matrix-table td {
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.15s;
+    cursor: default;
+}
+.matrix-table td:hover {
+    transform: scale(1.1);
+    z-index: 2;
+    position: relative;
+}
+.matrix-table .row-header {
+    background: rgba(0,0,0,0.3);
+    text-align: left;
+    padding-left: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Heatmap colors */
+.heat-self   { background: rgba(100,100,120,0.3); color: var(--text-muted); font-style:italic; }
+.heat-low    { background: rgba(46,204,113,0.15); color: var(--accent-green); }
+.heat-med    { background: rgba(241,196,15,0.2); color: var(--accent-yellow); }
+.heat-high   { background: rgba(231,76,60,0.25); color: var(--accent-red); }
+
+/* ── Pair Rankings ───────────────────────────────────── */
+.pair-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.pair-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s;
+}
+.pair-item:hover {
+    background: rgba(255,255,255,0.03);
+}
+.pair-item:last-child { border-bottom: none; }
+
+.pair-rank {
+    font-size: 1.2rem;
+    font-weight: 800;
+    min-width: 40px;
+    color: var(--text-muted);
+}
+.pair-info {
+    flex: 1;
+}
+.pair-files {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+.pair-files span {
+    color: var(--accent-red);
+}
+.pair-category {
+    font-size: 0.8rem;
+}
+.pair-score {
+    font-size: 1.4rem;
+    font-weight: 800;
+    min-width: 80px;
+    text-align: right;
+}
+.pair-score.high { color: var(--accent-red); }
+.pair-score.med  { color: var(--accent-yellow); }
+.pair-score.low  { color: var(--accent-green); }
+
+.badge-cat {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.badge-cat.high { background: rgba(231,76,60,0.15); color: var(--accent-red); }
+.badge-cat.med  { background: rgba(241,196,15,0.15); color: var(--accent-yellow); }
+.badge-cat.low  { background: rgba(46,204,113,0.15); color: var(--accent-green); }
+</style>
+
+<div style="max-width: 1100px; margin: 0 auto; width: 100%;">
+
+    <!-- Header -->
+    <div style="margin-bottom: 2rem;">
+        <h1 class="page-title">📊 Batch {{ mode|title }} Comparison Results</h1>
+        <p class="page-subtitle">Cross-comparison of {{ total_files }} uploaded {{ mode }} files — every pair checked for plagiarism.</p>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="batch-summary">
+        <div class="batch-stat-card">
+            <div class="batch-stat-value">{{ total_files }}</div>
+            <div class="batch-stat-label">Files Analyzed</div>
+        </div>
+        <div class="batch-stat-card">
+            <div class="batch-stat-value">{{ pairs|length }}</div>
+            <div class="batch-stat-label">Pairs Compared</div>
+        </div>
+        <div class="batch-stat-card">
+            <div class="batch-stat-value">
+                {% if pairs %}{{ pairs[0].score }}%{% else %}0%{% endif %}
+            </div>
+            <div class="batch-stat-label">Highest Match</div>
+        </div>
+        <div class="batch-stat-card">
+            <div class="batch-stat-value">
+                {{ pairs|selectattr('score', 'greaterthan', 60)|list|length }}
+            </div>
+            <div class="batch-stat-label">🚨 High Plagiarism Matches</div>
+        </div>
+    </div>
+
+    <!-- Heatmap Matrix -->
+    <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">🗺️ Similarity Heatmap Matrix</h2>
+        <div class="matrix-wrapper">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th style="background:transparent;"></th>
+                        {% for name in file_names %}
+                        <th title="{{ name }}">{{ name[:12] }}{% if name|length > 12 %}…{% endif %}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(total_files) %}
+                    <tr>
+                        <td class="row-header" title="{{ file_names[i] }}">{{ file_names[i][:14] }}{% if file_names[i]|length > 14 %}…{% endif %}</td>
+                        {% for j in range(total_files) %}
+                            {% set cell = matrix[i][j] %}
+                            {% if i == j %}
+                                <td class="heat-self">—</td>
+                            {% elif cell.score >= 61 %}
+                                <td class="heat-high">{{ cell.score }}%</td>
+                            {% elif cell.score >= 21 %}
+                                <td class="heat-med">{{ cell.score }}%</td>
+                            {% else %}
+                                <td class="heat-low">{{ cell.score }}%</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Ranked Pair List -->
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--glass-border);">
+            <h2 style="font-size: 1.2rem; margin: 0;">🏆 Top Ranked Similarities</h2>
+        </div>
+        <ul class="pair-list">
+            {% for pair in pairs %}
+            <li class="pair-item">
+                <div class="pair-rank">#{{ loop.index }}</div>
+                <div class="pair-info">
+                    <div class="pair-files"><span>{{ pair.file1 }}</span> ↔ <span>{{ pair.file2 }}</span></div>
+                    <div class="pair-category">
+                        <span class="badge-cat {% if pair.score >= 61 %}high{% elif pair.score >= 21 %}med{% else %}low{% endif %}">
+                            {{ pair.category }}
+                        </span>
+                    </div>
+                </div>
+                <div class="pair-score {% if pair.score >= 61 %}high{% elif pair.score >= 21 %}med{% else %}low{% endif %}">
+                    {{ pair.score }}%
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Back Button -->
+    <div class="flex-center mt-4" style="margin-bottom: 2rem;">
+        {% if mode == 'text' %}
+        <a href="/text-document-compare" class="btn btn-secondary">← Back to Text Check</a>
+        {% else %}
+        <a href="/visual-document-compare" class="btn btn-secondary">← Back to Visual Check</a>
+        {% endif %}
+        <a href="/dashboard" class="btn btn-primary" style="margin-left: 1rem;">📊 Dashboard</a>
+    </div>
+</div>
+
+{% endblock %}

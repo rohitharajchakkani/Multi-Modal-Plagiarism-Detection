@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% block title %}PlagiarismAI — Multi-Modal Detection{% endblock %}
+{% block content %}
+
+<!-- Neural Network Canvas Background -->
+<canvas id="neural-canvas"></canvas>
+
+<!-- Floating Geometric Shapes -->
+<div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="shape shape-5"></div>
+    <div class="shape shape-6"></div>
+    <div class="hex-grid">
+        <div class="hex hex-1"></div>
+        <div class="hex hex-2"></div>
+        <div class="hex hex-3"></div>
+    </div>
+</div>
+
+<!-- Scan Line Effect -->
+<div class="scan-line"></div>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <!-- Glowing Orb behind title -->
+    <div class="hero-glow-orb"></div>
+
+    <!-- Animated Badge -->
+    <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        <span>AI-Powered Detection Engine</span>
+    </div>
+
+    <!-- Title with typing effect -->
+    <h1 class="hero-title">
+        <span class="hero-title-line" style="animation-delay:0.2s">Multi-Modal</span>
+        <span class="hero-title-line hero-title-accent" style="animation-delay:0.5s">Plagiarism Detection</span>
+    </h1>
+
+    <!-- Animated subtitle with reveal -->
+    <p class="hero-subtitle">
+        <span class="subtitle-word" style="--i:0">Detect</span>
+        <span class="subtitle-word" style="--i:1">plagiarism</span>
+        <span class="subtitle-word" style="--i:2">in</span>
+        <span class="subtitle-word" style="--i:3">text</span>
+        <span class="subtitle-word" style="--i:4">&</span>
+        <span class="subtitle-word" style="--i:5">source</span>
+        <span class="subtitle-word" style="--i:6">code</span>
+        <span class="subtitle-word" style="--i:7">using</span>
+        <span class="subtitle-word" style="--i:8">AI-powered</span>
+        <span class="subtitle-word" style="--i:9">analysis</span>
+    </p>
+
+    <!-- Animated stats ticker -->
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <span class="hero-stat-value" data-count="3">0</span>
+            <span class="hero-stat-label">Analysis Modes</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+            <span class="hero-stat-value" data-count="99">0</span>
+            <span class="hero-stat-label">% Accuracy</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+            <span class="hero-stat-value" data-count="5">0</span>
+            <span class="hero-stat-label">Sec Analysis</span>
+        </div>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="hero-cta">
+        <a href="/login" class="btn-hero-primary" id="cta-get-started">
+            <span class="btn-hero-text">Get Started</span>
+            <span class="btn-hero-icon">→</span>
+            <div class="btn-hero-shine"></div>
+        </a>
+        <a href="/about" class="btn-hero-secondary">
+            <span>Learn More</span>
+        </a>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-mouse">
+            <div class="scroll-wheel"></div>
+        </div>
+        <span>Scroll to explore</span>
+    </div>
+</div>
+
+<!-- Feature Cards Section -->
+<div class="features-section">
+    <div class="section-header">
+        <span class="section-tag">CAPABILITIES</span>
+        <h2 class="section-heading">Three Layers of Detection</h2>
+        <p class="section-desc">Each level builds upon the last for comprehensive plagiarism analysis</p>
+    </div>
+
+    <div class="features-grid-hero">
+        <div class="feature-card-hero" data-reveal="left">
+            <div class="feature-card-number">01</div>
+            <div class="feature-card-glow" style="--glow-color: #3498db"></div>
+            <div class="feature-card-icon-wrap">
+                <div class="feature-card-icon-bg"></div>
+                <span class="feature-card-icon">📄</span>
+            </div>
+            <h3 class="feature-card-title">Text Document Comparison</h3>
+            <p class="feature-card-desc">TF-IDF Vectorization, Bag-of-Words Cosine Overlaps, and SentenceTransformers semantic embeddings for deep digital copy analysis.</p>
+            <div class="feature-card-tags">
+                <span class="feature-tag">TF-IDF</span>
+                <span class="feature-tag">Cosine</span>
+                <span class="feature-tag">Semantic Model</span>
+            </div>
+            <div class="feature-card-line"></div>
+        </div>
+
+        <div class="feature-card-hero" data-reveal="up">
+            <div class="feature-card-number">02</div>
+            <div class="feature-card-glow" style="--glow-color: #e74c3c"></div>
+            <div class="feature-card-icon-wrap">
+                <div class="feature-card-icon-bg"></div>
+                <span class="feature-card-icon">🖼️</span>
+            </div>
+            <h3 class="feature-card-title">Visual Document Comparison</h3>
+            <p class="feature-card-desc">Advanced Computer Vision layout structures correlation, dHash image similarity, HSV color profiling, and Tesseract OCR text parsing.</p>
+            <div class="feature-card-tags">
+                <span class="feature-tag">Layout Maps</span>
+                <span class="feature-tag">dHash</span>
+                <span class="feature-tag">OCR extraction</span>
+            </div>
+            <div class="feature-card-line"></div>
+        </div>
+
+        <div class="feature-card-hero" data-reveal="right">
+            <div class="feature-card-number">03</div>
+            <div class="feature-card-glow" style="--glow-color: #9b59b6"></div>
+            <div class="feature-card-icon-wrap">
+                <div class="feature-card-icon-bg"></div>
+                <span class="feature-card-icon">🌐</span>
+            </div>
+            <h3 class="feature-card-title">AI-Based Web Source Detection</h3>
+            <p class="feature-card-desc">Live search index querying using Tavily API & SerpAPI crawlers against Wikipedia, blogs, news feeds, and academic research repositories.</p>
+            <div class="feature-card-tags">
+                <span class="feature-tag">Tavily API</span>
+                <span class="feature-tag">SerpAPI</span>
+                <span class="feature-tag">Web Crawler</span>
+            </div>
+            <div class="feature-card-line"></div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="how-section">
+    <div class="section-header">
+        <span class="section-tag">WORKFLOW</span>
+        <h2 class="section-heading">How It Works</h2>
+    </div>
+    <div class="steps-timeline">
+        <div class="step-item" data-step="1">
+            <div class="step-connector"></div>
+            <div class="step-dot"><span>1</span></div>
+            <div class="step-content">
+                <h4>Upload Content</h4>
+                <p>Paste your text or code into the comparison fields</p>
+            </div>
+        </div>
+        <div class="step-item" data-step="2">
+            <div class="step-connector"></div>
+            <div class="step-dot"><span>2</span></div>
+            <div class="step-content">
+                <h4>AI Analysis</h4>
+                <p>Our engine processes using multiple detection algorithms</p>
+            </div>
+        </div>
+        <div class="step-item" data-step="3">
+            <div class="step-connector"></div>
+            <div class="step-dot"><span>3</span></div>
+            <div class="step-content">
+                <h4>Get Results</h4>
+                <p>View detailed similarity scores and visual reports</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom CTA -->
+<div class="bottom-cta glass-card" style="text-align:center;max-width:700px;width:100%;margin-bottom:2rem;">
+    <h2 class="section-heading" style="margin-bottom:0.5rem;">Ready to Detect?</h2>
+    <p class="section-desc" style="margin-bottom:1.5rem;">Start analyzing your content for plagiarism in seconds.</p>
+    <a href="/login" class="btn-hero-primary" style="display:inline-flex;">
+        <span class="btn-hero-text">Start Now</span>
+        <span class="btn-hero-icon">→</span>
+        <div class="btn-hero-shine"></div>
+    </a>
+</div>
+
+<!-- Landing Page Scripts -->
+<script>
+(function(){
+  // === Neural Network Canvas ===
+  var canvas = document.getElementById('neural-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var nodes = [];
+  var mouseX = -1000, mouseY = -1000;
+  var NODE_COUNT = 60;
+  var MAX_DIST = 160;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = document.querySelector('.hero-section').offsetHeight + 200;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Track mouse
+  document.addEventListener('mousemove', function(e){ mouseX=e.clientX; mouseY=e.clientY; });
+
+  // Create nodes
+  for (var i=0; i<NODE_COUNT; i++) {
+    nodes.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      vx: (Math.random()-0.5)*0.6,
+      vy: (Math.random()-0.5)*0.6,
+      r: Math.random()*2+1,
+      pulse: Math.random()*Math.PI*2
+    });
+  }
+
+  function drawNet() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Update & draw nodes
+    for (var i=0; i<nodes.length; i++) {
+      var n=nodes[i];
+      n.x+=n.vx; n.y+=n.vy;
+      n.pulse+=0.02;
+      if(n.x<0||n.x>canvas.width) n.vx*=-1;
+      if(n.y<0||n.y>canvas.height) n.vy*=-1;
+
+      // Mouse repulsion
+      var dx=n.x-mouseX, dy=n.y-mouseY;
+      var dm=Math.sqrt(dx*dx+dy*dy);
+      if(dm<120){
+        n.vx+=dx/dm*0.3;
+        n.vy+=dy/dm*0.3;
+      }
+      // Speed limit
+      var speed=Math.sqrt(n.vx*n.vx+n.vy*n.vy);
+      if(speed>1.5){n.vx*=1.5/speed;n.vy*=1.5/speed;}
+
+      var pulseFactor=0.5+Math.sin(n.pulse)*0.5;
+      var alpha=0.3+pulseFactor*0.4;
+
+      ctx.beginPath();
+      ctx.arc(n.x,n.y,n.r+pulseFactor,0,Math.PI*2);
+      ctx.fillStyle='rgba(231,76,60,'+alpha+')';
+      ctx.fill();
+
+      // Outer glow
+      ctx.beginPath();
+      ctx.arc(n.x,n.y,n.r+4+pulseFactor*2,0,Math.PI*2);
+      ctx.fillStyle='rgba(231,76,60,'+alpha*0.15+')';
+      ctx.fill();
+    }
+
+    // Draw connections
+    for(var i=0;i<nodes.length;i++){
+      for(var j=i+1;j<nodes.length;j++){
+        var dx=nodes[i].x-nodes[j].x;
+        var dy=nodes[i].y-nodes[j].y;
+        var dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<MAX_DIST){
+          var alpha=(1-dist/MAX_DIST)*0.2;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x,nodes[i].y);
+          ctx.lineTo(nodes[j].x,nodes[j].y);
+          ctx.strokeStyle='rgba(231,76,60,'+alpha+')';
+          ctx.lineWidth=0.6;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(drawNet);
+  }
+  drawNet();
+
+  // === Stat Counter ===
+  document.querySelectorAll('.hero-stat-value[data-count]').forEach(function(el){
+    var target=parseInt(el.dataset.count);
+    var current=0;
+    var step=Math.max(1,Math.floor(target/30));
+    setTimeout(function(){
+      var interval=setInterval(function(){
+        current+=step;
+        if(current>=target){current=target;clearInterval(interval);}
+        el.textContent=current;
+      },50);
+    },1200);
+  });
+
+  // === Scroll Reveal ===
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('revealed');
+        observer.unobserve(e.target);
+      }
+    });
+  },{threshold:0.15});
+  document.querySelectorAll('.feature-card-hero,.step-item,.bottom-cta').forEach(function(el){
+    observer.observe(el);
+  });
+
+})();
+</script>
+{% endblock %}

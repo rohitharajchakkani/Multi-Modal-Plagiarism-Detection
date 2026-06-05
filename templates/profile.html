@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}My Profile — PlagiarismAI{% endblock %}
+{% block content %}
+<div class="glass-card glass-card-lg" style="animation: fadeInUp 0.6s ease-out both;">
+    <h1 class="page-title" style="text-align: left; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; margin-bottom: 2rem;">My Profile</h1>
+    
+    <div style="display: flex; align-items: center; gap: 3rem; margin-top: 2rem; flex-wrap: wrap;">
+        <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-red), #c0392b); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #fff; box-shadow: 0 0 25px rgba(231,76,60,0.35);">
+            👤
+        </div>
+        <div>
+            <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0 0 0.5rem 0;">{{ session.get('user_name', 'Guest') }}</h2>
+            <p style="color: var(--text-secondary); font-size: 1rem; margin: 0 0 0.4rem 0;"><strong>Email:</strong> {{ session.get('user_email', 'guest@plagiarism.ai') }}</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0 0 0.4rem 0;"><strong>Role:</strong> User Account</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;"><strong>Active Session:</strong> Yes</p>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-primary" onclick="alert('Profile editing is disabled in demo mode.')" style="background: linear-gradient(135deg, var(--accent-red), #c0392b);">Edit Details</button>
+                <a href="/logout" class="btn btn-secondary" style="border-color: rgba(231,76,60,0.3); color: var(--accent-red);">Log Out</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

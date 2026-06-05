@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Audit Report #{{ comparison.id }} — PlagiarismAI{% endblock %}
+{% block content %}
+<div class="glass-card glass-card-xl" style="padding: 2.5rem; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: var(--radius-lg);">
+    <!-- Report Header -->
+    <div class="report-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 1.5rem;">
+        <div>
+            <h1 class="section-title" style="margin: 0 0 0.4rem 0; font-size: 1.8rem;">📋 Plagiarism Audit Report #{{ comparison.id }}</h1>
+            <p style="color:var(--text-muted);font-size:0.9rem; margin:0;">
+                Generated: {{ comparison.created_at }} · Type: {{ comparison.comparison_type|replace('_', ' ')|upper }} · Mode: {{ comparison.mode_used|upper }}
+            </p>
+        </div>
+        <div class="no-print">
+            <button class="btn btn-secondary btn-sm" id="print-report" style="padding: 0.5rem 1rem; font-weight: bold; border-color: rgba(255,255,255,0.08);">🖨️ Print / Download PDF</button>
+        </div>
+    </div>
+
+    <!-- Score Summary -->
+    <div class="report-section" style="margin-bottom: 2rem;">
+        <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap; background: rgba(0,0,0,0.15); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+            <div>
+                <div style="font-size:3.5rem;font-weight:800;color:{{ level_meta.color }}; line-height: 1;">
+                    {{ comparison.similarity_score }}%
+                </div>
+                <div style="font-size:0.85rem;color:var(--text-muted);margin-top: 0.4rem;text-transform: uppercase;font-weight: bold;">Overall Similarity</div>
+            </div>
+            <div>
+                <span class="badge" style="font-size:1rem;padding:0.5rem 1.5rem; background: {{ level_meta.color }}20; border: 1px solid {{ level_meta.color }}; border-radius: 50px; color: #fff; font-weight: bold;">
+                    🚨 {{ level_meta.label }}
+                </span>
+            </div>
+            <div class="progress-bar-container" style="flex:1;min-width:200px; height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden;">
+                <div class="progress-bar-fill" style="width: {{ comparison.similarity_score }}%; height: 100%; background: {{ level_meta.color }}; border-radius: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Breakdown -->
+    {% if comparison.detailed_results and comparison.detailed_results.breakdown %}
+    <div class="report-section" style="margin-bottom: 2.5rem;">
+        <h3 class="section-title" style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem; border-left: 3px solid var(--accent-purple); padding-left: 0.5rem;">Metric Weight Details</h3>
+        <div class="breakdown-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            {% for key, value in comparison.detailed_results.breakdown.items() %}
+            <div class="breakdown-card" style="background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); padding: 1.2rem; border-radius: var(--radius-md);">
+                <div class="breakdown-label" style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-bottom: 0.4rem;">{{ key|replace('_', ' ')|title }}</div>
+                <div class="breakdown-value" style="font-size: 1.5rem; font-weight: 700; color: #fff;">{{ value }}%</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Web Source Results if applicable -->
+    {% if comparison.web_sources and comparison.web_sources|length > 0 %}
+    <div class="report-section" style="margin-bottom: 2.5rem;">
+        <h3 class="section-title" style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem; border-left: 3px solid #9b59b6; padding-left: 0.5rem;">Identified Online Matches</h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for w in comparison.web_sources %}
+            <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 1.2rem; border-left: 4px solid var(--accent-red);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem;">
+                    <div>
+                        <span style="background: rgba(255,255,255,0.05); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; color: #fff; font-weight: bold; text-transform: uppercase;">
+                            {{ w.source_type }}
+                        </span>
+                        <strong style="color: var(--accent-blue); font-size: 0.95rem; margin-top: 0.3rem; display: block;">
+                            {{ w.source_title }}
+                        </strong>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.2rem;">URL: {{ w.source_url }}</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent-red);">{{ w.similarity_score }}%</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted); display: block; text-transform: uppercase;">Match</span>
+                    </div>
+                </div>
+                <div style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; font-style: italic;">
+                    "{{ w.matched_snippet }}"
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Input Texts -->
+    <div class="report-section" style="margin-bottom: 2rem;">
+        <h3 class="section-title" style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem; border-left: 3px solid var(--accent-blue); padding-left: 0.5rem;">Document Content Audit</h3>
+        <div class="report-inputs" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+            <div>
+                <p class="form-label" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem;">📄 Document 1 (Original)</p>
+                <div class="report-input-box" style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 1.2rem; border-radius: var(--radius-md); font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; max-height: 350px; overflow-y: auto; white-space: pre-wrap;">{{ comparison.input1_full }}</div>
+            </div>
+            {% if comparison.input2_full %}
+            <div>
+                <p class="form-label" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem;">📄 Document 2 (Comparison)</p>
+                <div class="report-input-box" style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 1.2rem; border-radius: var(--radius-md); font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; max-height: 350px; overflow-y: auto; white-space: pre-wrap;">{{ comparison.input2_full }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex-center mt-4 no-print" style="display: flex; justify-content: center; gap: 1rem;">
+        <a href="/select" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-weight: bold; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border: none;">🔍 New Comparison</a>
+        <a href="/history" class="btn btn-secondary" style="padding: 0.6rem 1.5rem; font-weight: bold;">📜 Back to History</a>
+    </div>
+</div>
+
+<style>
+@media print {
+    .no-print { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .glass-card { background: none !important; border: none !important; box-shadow: none !important; color: #000 !important; }
+    .report-input-box { background: #f9f9f9 !important; border: 1px solid #ccc !important; color: #000 !important; max-height: none !important; overflow: visible !important; }
+    strong, h1, h3 { color: #000 !important; }
+}
+</style>
+{% endblock %}

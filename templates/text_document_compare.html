@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% block title %}Text Document Comparison — PlagiarismAI{% endblock %}
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="/select" style="text-decoration: none; color: var(--text-muted); font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.2s;">
+            ← Back to Comparison Modes
+        </a>
+    </div>
+
+    <!-- Mode description -->
+    <div class="glass-card glass-card-lg" style="position: relative; overflow: hidden; margin-bottom: 2rem;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent-blue); border-radius: 50%; filter: blur(80px); opacity: 0.25; z-index: -1;"></div>
+        <h1 class="page-title" style="font-size: 2rem; background: linear-gradient(135deg, #fff 30%, #a5a5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Text Document Comparison</h1>
+        <p class="page-subtitle" style="color: var(--text-muted);">Compare two digital text documents or pasted content using our hybrid semantic pipeline.</p>
+    </div>
+
+    <!-- Tab Selection: File Upload or Pasted Text -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <button id="tab-upload" class="tab-btn active-tab" onclick="switchTab('upload')">📁 Upload Files</button>
+        <button id="tab-paste" class="tab-btn" onclick="switchTab('paste')">✍️ Paste Text</button>
+    </div>
+
+    <!-- Card for Upload Form -->
+    <div id="section-upload" class="glass-card glass-card-lg">
+        <form method="POST" action="/text-document-compare" enctype="multipart/form-data" id="text-file-form" onsubmit="showProgressBar('file-progress')">
+            <input type="hidden" name="input_mode" value="file">
+            <div class="input-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+                <!-- File 1 Drop Zone -->
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; display: block;">📄 Document 1 (Original)</label>
+                    <div class="batch-drop-zone" id="drop-zone-1" style="border: 2px dashed var(--glass-border); border-radius: var(--radius-lg); padding: 3rem 1.5rem; text-align: center; background: rgba(255,255,255,0.01); transition: all 0.3s ease; cursor: pointer; position: relative;">
+                        <div class="batch-drop-icon" style="font-size: 2.5rem; margin-bottom: 0.8rem;">📤</div>
+                        <div class="batch-drop-title" style="font-weight: 600;">Drag & Drop File 1 here</div>
+                        <div class="batch-drop-sub" style="font-size: 0.8rem; color: var(--text-muted);">TXT, PDF, DOC, DOCX supported</div>
+                        <input type="file" name="file1" id="file1-input" class="batch-file-input" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;" accept=".txt,.pdf,.doc,.docx" required>
+                    </div>
+                    <div id="file1-name" style="margin-top: 10px; font-weight: bold; color: var(--accent-blue);"></div>
+                </div>
+                
+                <!-- File 2 Drop Zone -->
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; display: block;">📄 Document 2 (Comparison)</label>
+                    <div class="batch-drop-zone" id="drop-zone-2" style="border: 2px dashed var(--glass-border); border-radius: var(--radius-lg); padding: 3rem 1.5rem; text-align: center; background: rgba(255,255,255,0.01); transition: all 0.3s ease; cursor: pointer; position: relative;">
+                        <div class="batch-drop-icon" style="font-size: 2.5rem; margin-bottom: 0.8rem;">📤</div>
+                        <div class="batch-drop-title" style="font-weight: 600;">Drag & Drop File 2 here</div>
+                        <div class="batch-drop-sub" style="font-size: 0.8rem; color: var(--text-muted);">TXT, PDF, DOC, DOCX supported</div>
+                        <input type="file" name="file2" id="file2-input" class="batch-file-input" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;" accept=".txt,.pdf,.doc,.docx" required>
+                    </div>
+                    <div id="file2-name" style="margin-top: 10px; font-weight: bold; color: var(--accent-purple);"></div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="file-progress-area" style="display: none; margin-top: 2rem;">
+                <div style="text-align: center; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">Extracting & Comparing Text...</div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                    <div id="file-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+            
+            <div class="flex-center mt-4" id="file-submit-area">
+                <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border: none; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">🔍 Analyze Documents</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Card for Paste Text Form -->
+    <div id="section-paste" class="glass-card glass-card-lg" style="display: none;">
+        <form method="POST" action="/text-document-compare" id="text-paste-form" onsubmit="showProgressBar('paste-progress')">
+            <input type="hidden" name="input_mode" value="paste">
+            <div class="input-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+                <div class="form-group">
+                    <label class="form-label" for="text1" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; display: block;">✍️ Original Text</label>
+                    <textarea class="form-textarea" id="text1" name="text1" placeholder="Paste the original text here..." style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 1rem; width: 100%; min-height: 250px; color: #fff; resize: vertical;" required></textarea>
+                    <div class="char-count" style="text-align: right; font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">0 characters</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="text2" style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; display: block;">✍️ Text to Compare</label>
+                    <textarea class="form-textarea" id="text2" name="text2" placeholder="Paste the content you wish to cross-reference..." style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 1rem; width: 100%; min-height: 250px; color: #fff; resize: vertical;" required></textarea>
+                    <div class="char-count" style="text-align: right; font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">0 characters</div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="paste-progress-area" style="display: none; margin-top: 2rem;">
+                <div style="text-align: center; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">Running Hybrid Cross-Reference...</div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                    <div id="paste-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <div class="flex-center mt-4" id="paste-submit-area">
+                <button type="button" class="btn btn-secondary" id="try-text-example" style="margin-right: 1rem;">💡 Try Example</button>
+                <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border: none; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">🔍 Check Similarity</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Batch Multi-File Upload Section -->
+    <div class="glass-card glass-card-lg" style="margin-top: 2rem;">
+        <h2 class="page-title" style="font-size:1.4rem; background: linear-gradient(135deg, #fff, #a5a5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📁 Batch Comparison — Multiple submissions</h2>
+        <p class="page-subtitle" style="color: var(--text-muted); margin-bottom: 1.5rem;">Upload multiple documents from different students or writers to cross-check plagiarism across all files.</p>
+
+        <form method="POST" action="/batch-text-compare" enctype="multipart/form-data" id="batch-text-form" onsubmit="showProgressBar('batch-progress')">
+            <div class="batch-drop-zone" id="batch-drop-zone" style="border: 2px dashed var(--glass-border); border-radius: var(--radius-lg); padding: 3rem 2rem; text-align: center; background: rgba(255,255,255,0.01); transition: all 0.3s ease; cursor: pointer; position: relative;">
+                <div class="batch-drop-icon" style="font-size: 2.5rem; margin-bottom: 0.8rem;">📤</div>
+                <div class="batch-drop-title" style="font-weight: 600;">Drag & Drop multiple text documents here</div>
+                <div class="batch-drop-sub" style="font-size: 0.8rem; color: var(--text-muted);">or click to browse — Min 2 files (.txt, .pdf, .docx, .doc)</div>
+                <input type="file" name="files[]" id="batch-file-input" class="batch-file-input" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;" multiple accept=".txt,.pdf,.docx,.doc" required>
+            </div>
+
+            <div class="batch-file-list" id="batch-file-list" style="display:none; margin-top: 1.5rem; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); border-radius: var(--radius-md); overflow: hidden;">
+                <div class="batch-file-header" style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                    <span class="batch-file-count" id="batch-file-count" style="font-weight: 600;">0 files selected</span>
+                    <button type="button" class="btn btn-secondary" id="batch-clear-btn" style="padding: 0.4rem 1rem; font-size: 0.85rem;">✕ Clear</button>
+                </div>
+                <div class="batch-file-items" id="batch-file-items" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="batch-progress-area" style="display: none; margin-top: 2rem;">
+                <div style="text-align: center; margin-bottom: 8px; font-weight: bold; color: var(--text-primary);">Processing Batch Similarity Matrix...</div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                    <div id="batch-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <div class="flex-center mt-3" id="batch-submit-area">
+                <button type="submit" class="btn btn-primary btn-lg" id="batch-submit-btn" style="background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border: none; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);" disabled>
+                    🔍 Compare All Files
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.tab-btn {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 0.8rem 2rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+.tab-btn.active-tab {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+.batch-drop-zone.dragover {
+    border-color: var(--accent-blue) !important;
+    background: rgba(52, 152, 219, 0.05) !important;
+}
+.batch-drop-zone:hover {
+    border-color: rgba(255,255,255,0.25) !important;
+    background: rgba(255,255,255,0.03) !important;
+}
+.batch-file-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.9rem;
+}
+.batch-file-item:last-child {
+    border-bottom: none;
+}
+.batch-file-item .file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
+
+<script>
+function switchTab(tab) {
+    if (tab === 'upload') {
+        document.getElementById('tab-upload').classList.add('active-tab');
+        document.getElementById('tab-paste').classList.remove('active-tab');
+        document.getElementById('section-upload').style.display = 'block';
+        document.getElementById('section-paste').style.display = 'none';
+    } else {
+        document.getElementById('tab-upload').classList.remove('active-tab');
+        document.getElementById('tab-paste').classList.add('active-tab');
+        document.getElementById('section-upload').style.display = 'none';
+        document.getElementById('section-paste').style.display = 'block';
+    }
+}
+
+function showProgressBar(type) {
+    let submitId = 'file-submit-area';
+    let progressId = 'file-progress-area';
+    let barId = 'file-progress-bar';
+
+    if (type === 'paste-progress') {
+        submitId = 'paste-submit-area';
+        progressId = 'paste-progress-area';
+        barId = 'paste-progress-bar';
+    } else if (type === 'batch-progress') {
+        submitId = 'batch-submit-area';
+        progressId = 'batch-progress-area';
+        barId = 'batch-progress-bar';
+    }
+
+    document.getElementById(submitId).style.display = 'none';
+    document.getElementById(progressId).style.display = 'block';
+    
+    let progress = 0;
+    const bar = document.getElementById(barId);
+    const interval = setInterval(() => {
+        progress += Math.random() * 15 + 3;
+        if (progress > 92) {
+            progress = 92;
+            clearInterval(interval);
+        }
+        bar.style.width = progress + '%';
+    }, 400);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup drop zones naming
+    function setupDropZone(dropZoneId, inputId, nameId) {
+        const dropZone = document.getElementById(dropZoneId);
+        const fileInput = document.getElementById(inputId);
+        const nameDiv = document.getElementById(nameId);
+
+        ['dragenter','dragover','dragleave','drop'].forEach(e => {
+            dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+        });
+        ['dragenter','dragover'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.add('dragover'), false);
+        });
+        ['dragleave','drop'].forEach(e => {
+            dropZone.addEventListener(e, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileName();
+        });
+
+        fileInput.addEventListener('change', updateFileName);
+
+        function updateFileName() {
+            if (fileInput.files.length > 0) {
+                nameDiv.textContent = 'Selected: ' + fileInput.files[0].name;
+            } else {
+                nameDiv.textContent = '';
+            }
+        }
+    }
+    
+    setupDropZone('drop-zone-1', 'file1-input', 'file1-name');
+    setupDropZone('drop-zone-2', 'file2-input', 'file2-name');
+
+    // Batch upload list
+    const batchDropZone = document.getElementById('batch-drop-zone');
+    const batchFileInput = document.getElementById('batch-file-input');
+    const batchFileList = document.getElementById('batch-file-list');
+    const batchFileItems = document.getElementById('batch-file-items');
+    const batchFileCount = document.getElementById('batch-file-count');
+    const batchClearBtn = document.getElementById('batch-clear-btn');
+    const batchSubmitBtn = document.getElementById('batch-submit-btn');
+
+    ['dragenter','dragover','dragleave','drop'].forEach(e => {
+        batchDropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+    });
+    ['dragenter','dragover'].forEach(e => {
+        batchDropZone.addEventListener(e, () => batchDropZone.classList.add('dragover'), false);
+    });
+    ['dragleave','drop'].forEach(e => {
+        batchDropZone.addEventListener(e, () => batchDropZone.classList.remove('dragover'), false);
+    });
+
+    batchDropZone.addEventListener('drop', function(e) {
+        batchFileInput.files = e.dataTransfer.files;
+        updateBatchFileList(e.dataTransfer.files);
+    });
+
+    batchFileInput.addEventListener('change', function() {
+        updateBatchFileList(this.files);
+    });
+
+    batchClearBtn.addEventListener('click', function() {
+        batchFileInput.value = '';
+        batchFileList.style.display = 'none';
+        batchFileItems.innerHTML = '';
+        batchSubmitBtn.disabled = true;
+    });
+
+    function updateBatchFileList(files) {
+        if (!files || files.length === 0) return;
+        batchFileList.style.display = 'block';
+        batchFileItems.innerHTML = '';
+        batchFileCount.textContent = files.length + ' file' + (files.length > 1 ? 's' : '') + ' selected';
+        batchSubmitBtn.disabled = files.length < 2;
+
+        Array.from(files).forEach(f => {
+            const sizeKB = (f.size / 1024).toFixed(1);
+            batchFileItems.insertAdjacentHTML('beforeend',
+                '<div class="batch-file-item">' +
+                '  <span class="file-icon">📄</span>' +
+                '  <span class="file-name">' + f.name + '</span>' +
+                '  <span class="file-size" style="color: var(--text-muted); font-size: 0.8rem;">' + sizeKB + ' KB</span>' +
+                '</div>'
+            );
+        });
+    }
+});
+</script>
+{% endblock %}

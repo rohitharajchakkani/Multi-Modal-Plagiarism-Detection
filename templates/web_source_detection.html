@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Web Source Detection — PlagiarismAI{% endblock %}
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="/select" style="text-decoration: none; color: var(--text-muted); font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.2s;">
+            ← Back to Comparison Modes
+        </a>
+    </div>
+
+    <h1 class="page-title" style="text-align: center; font-size: 2.2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 30%, #a5a5a5); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI-Based Web Source Detection</h1>
+    <p class="page-subtitle" style="text-align: center; margin-bottom: 3rem; color: var(--text-muted);">Compare your local files or pasted content directly with live web sources.</p>
+
+    <div class="mode-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+        <!-- Sub-mode A: Text Document from Web -->
+        <a href="/web-text-compare" class="mode-card" id="submode-text-web" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; transition: all 0.3s ease; text-decoration: none; position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2.5rem 2rem;">
+            <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: var(--accent-blue); border-radius: 50%; filter: blur(50px); opacity: 0.2; z-index: -1;"></div>
+            <div>
+                <div class="mode-icon" style="font-size: 3.5rem; margin-bottom: 1.5rem;">📄</div>
+                <h2 class="mode-title" style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">Text Document from Web</h2>
+                <p class="mode-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                    Upload written documents (.txt, .pdf, .docx) or paste written text to run intelligent queries against Wikipedia, research indices, blogs, and news databases.
+                </p>
+                <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 1.5rem;">
+                    PASTED TEXT • TXT • PDF • DOCX
+                </div>
+            </div>
+            <span class="btn btn-primary" style="align-self: flex-start; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border: none; padding: 0.7rem 1.5rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; color: #fff;">
+                Scan Text From Web →
+            </span>
+        </a>
+
+        <!-- Sub-mode B: Visual Document from Web -->
+        <a href="/web-visual-compare" class="mode-card" id="submode-visual-web" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; transition: all 0.3s ease; text-decoration: none; position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2.5rem 2rem;">
+            <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: var(--accent-red); border-radius: 50%; filter: blur(50px); opacity: 0.2; z-index: -1;"></div>
+            <div>
+                <div class="mode-icon" style="font-size: 3.5rem; margin-bottom: 1.5rem;">🖼️</div>
+                <h2 class="mode-title" style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 0.8rem;">Visual Document from Web</h2>
+                <p class="mode-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                    Upload posters, scanned notes, templates, or infographics. The system performs advanced OCR text extraction before scanning key queries across web sites.
+                </p>
+                <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-red); margin-bottom: 1.5rem;">
+                    IMAGES • POSTERS • HANDWRITTEN NOTES • PDF
+                </div>
+            </div>
+            <span class="btn btn-primary" style="align-self: flex-start; background: linear-gradient(135deg, var(--accent-red), #e67e22); border: none; padding: 0.7rem 1.5rem; border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; color: #fff;">
+                Scan Visuals From Web →
+            </span>
+        </a>
+    </div>
+</div>
+
+<style>
+.mode-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+</style>
+{% endblock %}
