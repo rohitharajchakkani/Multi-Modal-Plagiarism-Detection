@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /dashboard
+Disallow: /history
+Disallow: /history/*
+Disallow: /profile
+Disallow: /notifications
+Disallow: /settings
+Disallow: /result/*
+Disallow: /report/*

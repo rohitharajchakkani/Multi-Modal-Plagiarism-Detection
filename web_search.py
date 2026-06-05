@@ -243,8 +243,39 @@ def search_with_serpapi(query, api_key):
     return []
 
 
+from urllib.parse import urlparse
+
+def is_local_or_private_url(url):
+    """Determine if a URL points to local, loopback, or private networks."""
+    if not url:
+        return True
+    url_lower = url.lower()
+    local_patterns = [
+        r'localhost',
+        r'127\.0\.0\.1',
+        r'0\.0\.0\.0',
+        r'192\.168\.',
+        r'10\.',
+        r'172\.(1[6-9]|2[0-9]|3[0-1])\.',
+        r'169\.254\.'
+    ]
+    try:
+        parsed = urlparse(url_lower)
+        hostname = parsed.hostname
+        if not hostname:
+            return True
+        if any(re.search(pat, hostname) for pat in local_patterns):
+            return True
+    except Exception:
+        return True
+    return False
+
+
 def fetch_page_text(url):
     """Fetch text content from a web page using BeautifulSoup."""
+    if is_local_or_private_url(url):
+        print(f"[Web Search] Scraper skipped local/private URL: {url}")
+        return ""
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
     }

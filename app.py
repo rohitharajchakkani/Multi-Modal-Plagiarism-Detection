@@ -960,6 +960,16 @@ def about():
     return render_template('about.html')
 
 
+# ── Robots.txt Exposer ────────────────────────────────────
+@app.route('/robots.txt')
+def serve_robots():
+    """Serve robots.txt for search engines/API crawlers."""
+    import os
+    from flask import send_from_directory
+    static_dir = os.path.join(app.root_path, 'static')
+    return send_from_directory(static_dir, 'robots.txt')
+
+
 # ── API endpoints ─────────────────────────────────────────
 @app.route('/api/stats')
 def api_stats():
