@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'plagiarism-detector-secret-key-2024')
 DEBUG = True
 
 # Database settings
-DATABASE_PATH = os.path.join(BASE_DIR, 'plagiarism.db')
+DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(BASE_DIR, 'plagiarism.db'))
 SCHEMA_PATH = os.path.join(BASE_DIR, 'schema.sql')
 
 # Application settings
