@@ -14,6 +14,9 @@
             <button id="export-csv-btn" class="btn btn-secondary" onclick="exportToCSV()" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                 📊 Export CSV
             </button>
+            <a href="/report/{{ comparison.id }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none;">
+                📋 View Full Audit Report
+            </a>
             <button id="print-report" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                 🖨️ Download PDF Report
             </button>
@@ -349,6 +352,7 @@
                 <a href="/web-visual-compare" class="btn btn-secondary" style="padding: 0.8rem 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">📤 Upload New File</a>
             {% endif %}
             
+            <a href="/report/{{ comparison.id }}" class="btn btn-secondary" style="padding: 0.8rem 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">📋 View Full Audit Report</a>
             <button class="btn btn-secondary" onclick="window.print()" style="padding: 0.8rem 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">📄 Download PDF Report</button>
             
             {% if 'web' in comparison.comparison_type %}
@@ -371,6 +375,7 @@
                 <a href="/history/rerun/{{ comparison.id }}" class="btn btn-secondary btn-sm" style="box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; gap: 0.4rem; padding: 0.5rem 1rem;">🔄 Compare Another File</a>
                 <a href="/select" class="btn btn-secondary btn-sm" style="box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; gap: 0.4rem; padding: 0.5rem 1rem;">🔍 Return to Detect</a>
                 <a href="/history" class="btn btn-secondary btn-sm" style="box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; gap: 0.4rem; padding: 0.5rem 1rem;">📜 View History</a>
+                <a href="/report/{{ comparison.id }}" class="btn btn-secondary btn-sm" style="box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; gap: 0.4rem; padding: 0.5rem 1rem;">📋 View Full Audit Report</a>
                 <button class="btn btn-secondary btn-sm" onclick="window.print()" style="box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; gap: 0.4rem; padding: 0.5rem 1rem;">📥 Download Report</button>
                 <button class="btn btn-secondary btn-sm" onclick="shareReport()" style="box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; gap: 0.4rem; padding: 0.5rem 1rem;">🔗 Share Report</button>
                 <a href="/dashboard" class="btn btn-secondary btn-sm" style="box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; gap: 0.4rem; padding: 0.5rem 1rem;">📊 Go to Dashboard</a>
